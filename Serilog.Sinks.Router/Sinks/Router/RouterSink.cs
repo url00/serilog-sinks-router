@@ -49,6 +49,8 @@ namespace Serilog.Sinks.Router.Sinks.Router
 
         private void Reconfigure(RouterSinkOptions options)
         {
+            SelfLog.WriteLine("Router logging configuration change detected, attempting to parse new expressions.");
+
             if (string.IsNullOrEmpty(options.ShouldEmitSinkAExpression))
             {
                 options.ShouldEmitSinkAExpression = "false";
@@ -65,7 +67,7 @@ namespace Serilog.Sinks.Router.Sinks.Router
             {
                 var possibleNewEmit = interpreter.ParseAsDelegate<Func<LogEvent, bool>>(options.ShouldEmitSinkAExpression, "this");
                 compiledShouldEmitAFunc = possibleNewEmit;
-                LogString(sinkA, shouldEmitBExpression);
+                SelfLog.WriteLine("Parsed expression for sink A: {0}", compiledShouldEmitAFunc);
             }
             catch (Exception e)
             {
@@ -76,7 +78,7 @@ namespace Serilog.Sinks.Router.Sinks.Router
             {
                 var possibleNewEmit = interpreter.ParseAsDelegate<Func<LogEvent, bool>>(options.ShouldEmitSinkBExpression, "this");
                 compiledShouldEmitBFunc = possibleNewEmit;
-                LogString(sinkB, shouldEmitBExpression);
+                SelfLog.WriteLine("Parsed expression for sink B: {0}", compiledShouldEmitBFunc);
             }
             catch (Exception e)
             {
