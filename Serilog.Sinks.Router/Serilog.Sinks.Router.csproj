@@ -3,7 +3,24 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
     <Nullable>enable</Nullable>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Title>Serilog Router Sink</Title>
+    <Authors>url00, Nathan Bergeron</Authors>
+    <Description>Uses DynamicExpresso and IOptions tracking to enable dynamic routing of LogEvents between two different sinks.</Description>
+    <Copyright>MIT</Copyright>
+    <PackageProjectUrl>https://serilog.net/</PackageProjectUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryUrl>https://github.com/url00/serilog-sinks-router</RepositoryUrl>
+    <PackageTags>serilog;sink;dynamic</PackageTags>
+    <PackageReleaseNotes>Initial release.</PackageReleaseNotes>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="DynamicExpresso.Core" Version="2.16.0" />
