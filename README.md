@@ -1,6 +1,4 @@
-﻿# Markdown File
-
-# Router Sink for Serilog
+﻿# Router Sink for Serilog
 
 Uses DynamicExpresso and IOptions tracking to enable dynamic routing of LogEvents between two different sinks.
 
@@ -10,8 +8,9 @@ Uses DynamicExpresso and IOptions tracking to enable dynamic routing of LogEvent
 
 ## Usage
 
+From inside a ASP.Net Core application:
+
 ```csharp
-// Inside an ASP.Net Core application:
 var builder = WebApplication.CreateBuilder(args);
 
 // To enable dynamic recompilation you must enable the "reloadOnChange" flag.
