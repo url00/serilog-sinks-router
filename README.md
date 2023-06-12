@@ -2,6 +2,8 @@
 
 Uses DynamicExpresso and IOptions tracking to enable dynamic routing of LogEvents between two different sinks.
 
+[![NuGet version (Serilog.Sinks.Router)](https://img.shields.io/nuget/v/Serilog.Sinks.Router?style=flat-square)](https://www.nuget.org/packages/Serilog.Sinks.Router/)
+
 ## Targets
 
 * [.NET Standard 2.1](https://github.com/dotnet/standard/blob/master/docs/versions.md) (netstandard2.1)
