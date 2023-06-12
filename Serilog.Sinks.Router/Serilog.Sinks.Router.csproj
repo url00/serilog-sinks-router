@@ -13,6 +13,7 @@
     <RepositoryUrl>https://github.com/url00/serilog-sinks-router</RepositoryUrl>
     <PackageTags>serilog;sink;dynamic</PackageTags>
     <PackageReleaseNotes>Initial release.</PackageReleaseNotes>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
 
   <ItemGroup>
