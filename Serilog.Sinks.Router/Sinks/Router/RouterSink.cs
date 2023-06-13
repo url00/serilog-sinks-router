@@ -46,6 +46,20 @@ namespace Serilog.Sinks.Router.Sinks.Router
         }
 
 
+
+        private void SafeRelease()
+        {
+            try
+            {
+                onChangeSemaphore.Release();
+            }
+            catch (Exception e)
+            {
+                SelfLog.WriteLine("Failed to release lock around RouterSink configuration.");
+            }
+        }
+
+
         private async void Reconfigure(RouterSinkOptions options)
         {
             SelfLog.WriteLine("Router logging configuration change detected, attempting to parse new expressions.");
@@ -71,6 +85,8 @@ namespace Serilog.Sinks.Router.Sinks.Router
             catch (Exception e)
             {
                 SelfLog.WriteLine("Error waiting for lock to change options: {0}", e);
+                SafeRelease();
+                return;
             }
 
             try
@@ -82,6 +98,8 @@ namespace Serilog.Sinks.Router.Sinks.Router
             catch (Exception e)
             {
                 SelfLog.WriteLine("Error parsing expression: {0} {1} {2}", nameof(compiledShouldEmitAFunc), options.ShouldEmitSinkAExpression, e);
+                SafeRelease();
+                return;
             }
 
             try
@@ -93,11 +111,13 @@ namespace Serilog.Sinks.Router.Sinks.Router
             catch (Exception e)
             {
                 SelfLog.WriteLine("Error parsing expression: {0} {1} {2}", nameof(compiledShouldEmitAFunc), options.ShouldEmitSinkBExpression, e);
+                SafeRelease();
+                return;
             }
 
 
-
-            onChangeSemaphore.Release();
+            
+            SafeRelease();
         }
 
 
