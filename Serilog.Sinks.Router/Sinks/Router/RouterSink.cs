@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using DynamicExpresso;
 using Microsoft.Extensions.Options;
-using Microsoft.Extensions.Primitives;
 using Serilog.Core;
 using Serilog.Debugging;
 using Serilog.Events;
@@ -19,12 +19,11 @@ namespace Serilog.Sinks.Router.Sinks.Router
         private readonly ILogEventSink sinkA;
         private readonly ILogEventSink sinkB;
         private readonly IDisposable? routerSinkOptionsMonitorDisposable;
+        private readonly SemaphoreSlim onChangeSemaphore = new SemaphoreSlim(1, 1);
         private readonly Interpreter interpreter;
 
-
         private RouterSinkOptions currentOptions = new RouterSinkOptions();
-
-
+        
         private Func<LogEvent, bool> compiledShouldEmitAFunc;
         private string shouldEmitAExpression = "false";
         private Func<LogEvent, bool> compiledShouldEmitBFunc;
@@ -47,7 +46,7 @@ namespace Serilog.Sinks.Router.Sinks.Router
         }
 
 
-        private void Reconfigure(RouterSinkOptions options)
+        private async void Reconfigure(RouterSinkOptions options)
         {
             SelfLog.WriteLine("Router logging configuration change detected, attempting to parse new expressions.");
 
@@ -63,11 +62,22 @@ namespace Serilog.Sinks.Router.Sinks.Router
 
             currentOptions = options;
 
+
+
+            try
+            {
+                await onChangeSemaphore.WaitAsync(100);
+            }
+            catch (Exception e)
+            {
+                SelfLog.WriteLine("Error waiting for lock to change options: {0}", e);
+            }
+
             try
             {
                 var possibleNewEmit = interpreter.ParseAsDelegate<Func<LogEvent, bool>>(options.ShouldEmitSinkAExpression, "this");
                 compiledShouldEmitAFunc = possibleNewEmit;
-                SelfLog.WriteLine("Parsed expression for sink A: {0}", compiledShouldEmitAFunc);
+                SelfLog.WriteLine("Parsed expression for sink A: {0}", options.ShouldEmitSinkAExpression);
             }
             catch (Exception e)
             {
@@ -78,12 +88,16 @@ namespace Serilog.Sinks.Router.Sinks.Router
             {
                 var possibleNewEmit = interpreter.ParseAsDelegate<Func<LogEvent, bool>>(options.ShouldEmitSinkBExpression, "this");
                 compiledShouldEmitBFunc = possibleNewEmit;
-                SelfLog.WriteLine("Parsed expression for sink B: {0}", compiledShouldEmitBFunc);
+                SelfLog.WriteLine("Parsed expression for sink B: {0}", options.ShouldEmitSinkBExpression);
             }
             catch (Exception e)
             {
                 SelfLog.WriteLine("Error parsing expression: {0} {1} {2}", nameof(compiledShouldEmitAFunc), options.ShouldEmitSinkBExpression, e);
             }
+
+
+
+            onChangeSemaphore.Release();
         }
 
 
